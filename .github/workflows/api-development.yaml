@@ -6,6 +6,19 @@ on:
       - main
 
 jobs:
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.0.0
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+        env:
+          CI: true  
   build:
     name: Build
     runs-on: ubuntu-latest

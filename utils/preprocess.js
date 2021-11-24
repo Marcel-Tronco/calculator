@@ -5,7 +5,7 @@ XRegExp.cache(illegalCombinationsPat)
 const preprocess = (rawString) => {
   let preprocessed = rawString.replace(/\s/g,'')
   const signingMinusPat = /^-|(?<=[+\-/*()])-/g
-  preprocessed = preprocessed.replace(signingMinusPat, "~")
+  preprocessed = preprocessed.replace(signingMinusPat, '~')
 
   if (XRegExp.test(preprocessed, illegalCombinationsPat)) {
     throw new InputError(`Invalid input: wrong format or bad encoding. Decoded input:${rawString}`)
