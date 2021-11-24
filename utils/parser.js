@@ -37,22 +37,22 @@ const CalcStringElement = require('../models/calcStringElement')
 
 const findClosingBracket = (subString) => {
   try {
-    let result = matchRecursive(subString, '\\(', '\\)', '', {valueNames: [null, null, null, "rightDel"]})
+    let result = matchRecursive(subString, '\\(', '\\)', '', { valueNames: [null, null, null, 'rightDel'] })
     let closingBracketIndex = result[0]['start']
     return closingBracketIndex
   } catch (error) {
-    throw new InputError("Invalid sequence: Missing closing bracket")
+    throw new InputError('Invalid sequence: Missing closing bracket')
   }
 }
 
 // preload relevant regexes
-const operatorPat = "[\+,\-,\*,\/]"
+const operatorPat = '[+,-,*,/]'
 cache(operatorPat)
 const catchAllNumPat = /(~*[0-9]*)/g
 cache(catchAllNumPat)
 
 const isOperator = (char) => {
-  return test(char, /[\+,\-,\*,\/]/)
+  return test(char, /[+,\-,*,/]/)
 }
 
 const isAllNum = (char) => {
@@ -61,35 +61,36 @@ const isAllNum = (char) => {
 
 const calculator = (firstNum, secondNum, operator) => {
   switch (operator) {
-    case "+":
-      return firstNum + secondNum
-    case "-":
-      return firstNum - secondNum
-    case "*":
-      return firstNum * secondNum
-    case "/":
-      result = firstNum / secondNum
-      if (result === Infinity || result === -Infinity) {
-        throw new DevisionByZeroError("Calculation included devision by Zero")
-      }
-      else {
-        return result
-      }
-    default:
-      throw new Error;
+  case '+':
+    return firstNum + secondNum
+  case '-':
+    return firstNum - secondNum
+  case '*':
+    return firstNum * secondNum
+  case '/': {
+    let result = firstNum / secondNum
+    if (result === Infinity || result === -Infinity) {
+      throw new DevisionByZeroError('Calculation included devision by Zero')
+    }
+    else {
+      return result
+    }
+  }
+  default:
+    throw new Error
   }
 }
 
 const createElementList = (preprocessedCalcString) => {
   let elementList = []
   let currentIndex = 0
-  while (true) {
+  for (;;) {
     if (currentIndex >= preprocessedCalcString.length){
       break
-    } 
+    }
     let currentChar = preprocessedCalcString[currentIndex]
     if (currentChar === '(') {
-      let closingBracketIndex = currentIndex + findClosingBracket(preprocessedCalcString.slice(currentIndex)) 
+      let closingBracketIndex = currentIndex + findClosingBracket(preprocessedCalcString.slice(currentIndex))
       elementList = elementList.concat([ new CalcStringElement(
         preprocessedCalcString.slice(currentIndex + 1, closingBracketIndex),
         closingBracketIndex !== preprocessedCalcString.length - 1 ? preprocessedCalcString[closingBracketIndex + 1] : null,
@@ -103,12 +104,12 @@ const createElementList = (preprocessedCalcString) => {
       continue
     }
     else if (isAllNum(currentChar)) {
-      let numberString = match(preprocessedCalcString.slice(currentIndex), catchAllNumPat, "one")
+      let numberString = match(preprocessedCalcString.slice(currentIndex), catchAllNumPat, 'one')
       let cleanedNumberString = numberString.replace(/~{2}/,'')
       if (cleanedNumberString === '' || ( cleanedNumberString[0] === '~' && cleanedNumberString.length === 1)) {
         elementList =  elementList.concat([ new CalcStringElement(
           cleanedNumberString === 0 ? 1 : -1,
-          "*",
+          '*',
           currentIndex !== 0 ? elementList[elementList.length - 1].nextOperator : null
         )])
         currentIndex += numberString.length
@@ -126,7 +127,7 @@ const createElementList = (preprocessedCalcString) => {
       }
     }
     else {
-      throw new Error("Unknown error occured.")
+      throw new Error('Unknown error occured.')
     }
   }
   return elementList
@@ -154,11 +155,11 @@ const parseElements = (elementList) => {
           typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
           element.lastOperator
         )
-        return calculator(previousValue[0], tmp, previousValue[1]["lastOperator"])
+        return calculator(previousValue[0], tmp, previousValue[1]['lastOperator'])
       }
     }
     else {
-      if ("+-".includes(element.lastOperator)) {
+      if ('+-'.includes(element.lastOperator)) {
         if (previousValue[1]) {
           let update = calculator(previousValue[0], previousValue[1].value, previousValue[1].lastOperator)
           return [
@@ -179,7 +180,7 @@ const parseElements = (elementList) => {
           ]
         }
       }
-      else if ("*/".includes(element.lastOperator)) {
+      else if ('*/'.includes(element.lastOperator)) {
         if (previousValue[1]) {
           let tmp = calculator(
             previousValue[1].value,
@@ -203,7 +204,7 @@ const parseElements = (elementList) => {
         }
       }
       else {
-        throw new Error("Unknown Error while reducing.")
+        throw new Error('Unknown Error while reducing.')
       }
     }
   }, 0)
@@ -216,4 +217,4 @@ const parser = (preprocessedCalcString) => {
   return result
 }
 
-module.exports = { parser, createElementList, parseElements}
+module.exports = { parser, createElementList, parseElements }

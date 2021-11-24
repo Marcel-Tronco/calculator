@@ -1,30 +1,30 @@
 class InputError extends Error {
   constructor(...params) {
-    super(...params);
+    super(...params)
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, InputError);
+      Error.captureStackTrace(this, InputError)
     }
-    this.name = "InputError"
+    this.name = 'InputError'
   }
 }
 
 class DevisionByZeroError extends Error {
   constructor(...params) {
-    super(...params);
+    super(...params)
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, InputError);
+      Error.captureStackTrace(this, InputError)
     }
-    this.name = "DevisionByZeroError"
+    this.name = 'DevisionByZeroError'
   }
 }
 
 class DecodingError extends Error {
   constructor(...params) {
-    super(...params);
+    super(...params)
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, InputError);
+      Error.captureStackTrace(this, InputError)
     }
-    this.name = "DecodingError"
+    this.name = 'DecodingError'
   }
 }
 
