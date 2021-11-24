@@ -13,20 +13,24 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-  logger.error(error.message)
-  if (error.name === 'InputError') {
+  logger.error(`${new Date().toLocaleString()}: ${error.message}`)
+  if (
+    error.name === 'InputError'
+    || error.name === 'DevisionByZeroError'
+    || error.name === 'DecodingError'
+    ) {
     return response.status(400).send({ 
       error: true,
       message: error.message
     })
   }
-  else if (error.name === 'DevisionByZeroError') {
-    return response.status(400).send({ 
+  else {
+    logger.error(error)
+    return response.status(500).send({ 
       error: true,
-      message: error.message
+      message: "Internal Server Error"
     })
   }
-  next(error)
 }
 
 module.exports = {

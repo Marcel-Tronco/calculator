@@ -4,7 +4,8 @@
   "description": "A server exposing an endpoint to a simple calculator.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose"
+    "test": "NODE_ENV=test jest --verbose --runInBand",
+    "dev": "NODE_ENV=development nodemon index.js"
   },
   "author": "Marcel Klotz",
   "license": "ISC",
@@ -15,7 +16,9 @@
   },
   "devDependencies": {
     "dotenv": "^10.0.0",
-    "jest": "^27.3.1"
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
   },
   "jest": {
     "testEnvironment": "node"

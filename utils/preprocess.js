@@ -8,7 +8,7 @@ const preprocess = (rawString) => {
   preprocessed = preprocessed.replace(signingMinusPat, "~")
 
   if (XRegExp.test(preprocessed, illegalCombinationsPat)) {
-    throw new InputError('Invalid input: wrong format.')
+    throw new InputError(`Invalid input: wrong format or bad encoding. Decoded input:${rawString}`)
   }
   return preprocessed
 }

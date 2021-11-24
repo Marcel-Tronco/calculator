@@ -1,31 +1,23 @@
 const calcRouter = require('express').Router()
-const parser = require('../utils/parser')
+const { parser } = require('../utils/parser')
 const preprocess = require('../utils/preprocess')
-const { InputError } = require('../utils/errors')
-
-
-const checkCache = (calcString) => {
-  console.log("checkCache: Not implemented yet.")
-  return None
-}
+const { InputError, DecodingError} = require('../utils/errors')
 
 const decode = (rawParam) => {
-  console.log("decode: Not implemented yet.")
-  return
+  try {
+    let text = Buffer.from(rawParam, 'base64').toString('utf-8')
+    return text
+  } catch (error) {
+   throw new DecodingError("Request has bad encoding")
+  }
 }
 
-calcRouter.get('/', async (request, response) => {
-  if (cached = checkCache(request)) {
-    response.json(blogs)
-  }
-  else {
-    let rawString = decode(request.query.query)
+calcRouter.get('/', async (request, response, next) => {
+  try {
+    let rawString = request.query && request.query.query ? decode(request.query.query) : ""
     let preprocessed = preprocess(rawString)
     if (!preprocessed) {
-      throw new InputError("Bad/no input given.")
-    }
-    else if (cached = checkCache(preprocessed)) {
-      response.json(cached)
+     throw new InputError("Bad/no input given.")
     }
     else {
       let parsed = parser(preprocessed)
@@ -34,6 +26,8 @@ calcRouter.get('/', async (request, response) => {
         result: parsed
       })
     }
+  } catch (error) {
+    next(error)
   }
 })
 module.exports = calcRouter

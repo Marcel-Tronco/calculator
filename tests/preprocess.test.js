@@ -23,7 +23,7 @@ test('Illegal Combination "()23*34)+1"', () => {
   try {
     preprocess('()23*34)+1')  
   } catch (error) {
-    expect(error.message).toBe('Invalid input: wrong format.')
+    expect(error.message).toBe("Invalid input: wrong format or bad encoding. Decoded input:()23*34)+1")
   }
 })
 
@@ -32,6 +32,6 @@ test('Illegal Combination "*34+4"', () => {
   try {
     preprocess('*34+4')  
   } catch (error) {
-    expect(error.message).toBe('Invalid input: wrong format.')
+    expect(error.message).toBe("Invalid input: wrong format or bad encoding. Decoded input:*34+4")
   }
 })
