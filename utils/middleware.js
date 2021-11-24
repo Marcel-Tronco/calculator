@@ -20,6 +20,12 @@ const errorHandler = (error, request, response, next) => {
       message: error.message
     })
   }
+  else if (error.name === 'DevisionByZeroError') {
+    return response.status(400).send({ 
+      error: true,
+      message: error.message
+    })
+  }
   next(error)
 }
 

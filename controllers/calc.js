@@ -1,15 +1,8 @@
 const calcRouter = require('express').Router()
 const parser = require('../utils/parser')
 const preprocess = require('../utils/preprocess')
+const { InputError } = require('../utils/errors')
 
-class InputError extends Error {
-  constructor(...params) {
-    super(...params);
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, InputError);
-    }
-  }
-}
 
 const checkCache = (calcString) => {
   console.log("checkCache: Not implemented yet.")
@@ -31,7 +24,7 @@ calcRouter.get('/', async (request, response) => {
     if (!preprocessed) {
       throw new InputError("Bad/no input given.")
     }
-    else if (cached = checkCache(preprocess)) {
+    else if (cached = checkCache(preprocessed)) {
       response.json(cached)
     }
     else {
@@ -43,3 +36,4 @@ calcRouter.get('/', async (request, response) => {
     }
   }
 })
+module.exports = calcRouter

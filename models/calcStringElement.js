@@ -1,4 +1,4 @@
-class calcStringElement {
+class CalcStringElement {
   constructor(calcStringFragment, nextOperator, lastOperator) {
     this.value = calcStringFragment,
     this.lastOperator = lastOperator,
@@ -6,4 +6,4 @@ class calcStringElement {
   }
 }
 
-module.exports = calcStringElement
+module.exports = CalcStringElement
