@@ -19,8 +19,9 @@ jobs:
       - run: npm test
         env:
           CI: true  
-  build:
-    name: Build
+  deploy:
+    name: deploy
+    needs: testing
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
