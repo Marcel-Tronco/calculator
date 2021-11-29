@@ -4,7 +4,7 @@ const illegalCombinationsPat = /(?:^[+*)])|(?:\(\))|(?:[+*/][+*/])|(?:-[+*/)])|(
 XRegExp.cache(illegalCombinationsPat)
 const preprocess = (rawString) => {
   let preprocessed = rawString.replace(/\s/g,'')
-  const signingMinusPat = /^-|(?<=[+\-/*()])-/g
+  const signingMinusPat = /^-|(?<=[+\-/*(])-/g
   preprocessed = preprocessed.replace(signingMinusPat, '~')
 
   if (XRegExp.test(preprocessed, illegalCombinationsPat)) {

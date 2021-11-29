@@ -1,6 +1,7 @@
 const { InputError, DevisionByZeroError } = require('../utils/errors')
 const { matchRecursive, cache, test, match } = require('xregexp')
 const CalcStringElement = require('../models/calcStringElement')
+const PreviousValue = require('../models/previousValue')
 
 const findClosingBracket = (subString) => {
   try {
@@ -26,6 +27,10 @@ const isAllNum = (char) => {
   return test(char, catchAllNumPat)
 }
 
+const isNum = (char) => {
+  return isAllNum(char)
+}
+
 const calculator = (firstNum, secondNum, operator) => {
   switch (operator) {
   case '+':
@@ -44,18 +49,18 @@ const calculator = (firstNum, secondNum, operator) => {
     }
   }
   default:
-    throw new Error
+    throw new Error()
   }
 }
 
 const createElementList = (preprocessedCalcString) => {
   let elementList = []
   let currentIndex = 0
-  for (;;) {
-    if (currentIndex >= preprocessedCalcString.length){
-      break
-    }
+
+  // The loop parses the characters in custom steps until the end of the string is reached
+  while (currentIndex < preprocessedCalcString.length) {
     let currentChar = preprocessedCalcString[currentIndex]
+    // if a parenthesis is found the closing bracket will be searched and the elements value gets the string inside
     if (currentChar === '(') {
       let closingBracketIndex = currentIndex + findClosingBracket(preprocessedCalcString.slice(currentIndex))
       elementList = elementList.concat([ new CalcStringElement(
@@ -66,13 +71,16 @@ const createElementList = (preprocessedCalcString) => {
       currentIndex = closingBracketIndex + 1
       continue
     }
+    // if an operator is found we continue to the next character
     else if (isOperator(currentChar)) {
       currentIndex++
       continue
     }
-    else if (isAllNum(currentChar)) {
+    // if the character is a number or a sign, a number element will be created
+    else if (isNum(currentChar)) {
       let numberString = match(preprocessedCalcString.slice(currentIndex), catchAllNumPat, 'one')
       let cleanedNumberString = numberString.replace(/~{2}/,'')
+      // special case if either character was a sign and no number follows e.g. if it was infront of parenthesis
       if (cleanedNumberString === '' || ( cleanedNumberString[0] === '~' && cleanedNumberString.length === 1)) {
         elementList =  elementList.concat([ new CalcStringElement(
           cleanedNumberString === 0 ? 1 : -1,
@@ -82,6 +90,8 @@ const createElementList = (preprocessedCalcString) => {
         currentIndex += numberString.length
         continue
       }
+      // otherwise the number including its sign is the value of the element
+      // custom step will be after the end of the number string
       else {
         let numResult = cleanedNumberString[0] === '~' ? - parseInt(cleanedNumberString.slice(1)) : parseInt(cleanedNumberString)
         elementList = elementList.concat([ new CalcStringElement(
@@ -100,81 +110,20 @@ const createElementList = (preprocessedCalcString) => {
   return elementList
 }
 
+const getValueRecursion = (element) => {
+  return typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value))
+}
+
 const parseElements = (elementList) => {
   let result = elementList.reduce((previousValue, element) => {
-    if (! element.lastOperator) {
-      if (! element.nextOperator ) {
-        return typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value))
-      }
-      return typeof element.value === 'number' ? [ element.value ] : [ parseElements(createElementList(element.value)) ]
-    }
-    else if (! element.nextOperator) {
-      if (! previousValue[1]) {
-        return calculator(
-          previousValue[0],
-          typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-          element.lastOperator
-        )
-      }
-      else {
-        let tmp = calculator(
-          previousValue[1].value,
-          typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-          element.lastOperator
-        )
-        return calculator(previousValue[0], tmp, previousValue[1]['lastOperator'])
-      }
+    previousValue.addElement(getValueRecursion(element), element.lastOperator)
+    if (! element.nextOperator) {
+      return previousValue.getResult
     }
     else {
-      if ('+-'.includes(element.lastOperator)) {
-        if (previousValue[1]) {
-          let update = calculator(previousValue[0], previousValue[1].value, previousValue[1].lastOperator)
-          return [
-            update,
-            {
-              value: typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-              lastOperator: element.lastOperator
-            }
-          ]
-        }
-        else {
-          return [
-            previousValue[0],
-            {
-              value: typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-              lastOperator: element.lastOperator
-            }
-          ]
-        }
-      }
-      else if ('*/'.includes(element.lastOperator)) {
-        if (previousValue[1]) {
-          let tmp = calculator(
-            previousValue[1].value,
-            typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-            element.lastOperator
-          )
-          return [
-            previousValue[0],
-            {
-              value: tmp,
-              lastOperator: previousValue[1].lastOperator
-            }
-          ]
-        }
-        else {
-          return [calculator(
-            previousValue[0],
-            typeof element.value === 'number' ? element.value : parseElements(createElementList(element.value)),
-            element.lastOperator
-          )]
-        }
-      }
-      else {
-        throw new Error('Unknown Error while reducing.')
-      }
+      return previousValue
     }
-  }, 0)
+  }, new PreviousValue())
   return result
 }
 
@@ -184,4 +133,4 @@ const parser = (preprocessedCalcString) => {
   return result
 }
 
-module.exports = { parser, createElementList, parseElements }
+module.exports = { parser, createElementList, parseElements, calculator }

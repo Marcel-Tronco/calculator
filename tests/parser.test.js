@@ -24,3 +24,9 @@ test('Integration test with some negations "-1 ( (--2 * (3 -1) / 4 + 4) * (-2))"
   let result = parser(preprocessed)
   expect(result).toBe(10)
 })
+
+test('Integration test with some negations "2 * (23/(3*3))- 23 * (2*3)"', () => {
+  let preprocessed = preprocess('2 * (23/(3*3))- 23 * (2*3)')
+  let result = parser(preprocessed)
+  expect(result).toBe(-132.88888888888889)
+})

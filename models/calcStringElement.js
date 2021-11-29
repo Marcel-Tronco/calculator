@@ -6,4 +6,5 @@ class CalcStringElement {
   }
 }
 
+
 module.exports = CalcStringElement
