@@ -3,6 +3,11 @@ const { parser } = require('../utils/parser')
 const preprocess = require('../utils/preprocess')
 const { InputError, DecodingError } = require('../utils/errors')
 
+/**
+ * Returns the base64 string decoded as utf-8 string.
+ * @param { string } rawParam - base64 encoded query string.
+ * @returns { string }
+ */
 const decode = (rawParam) => {
   try {
     let text = Buffer.from(rawParam, 'base64').toString('utf-8')
