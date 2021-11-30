@@ -5,7 +5,7 @@ XRegExp.cache(illegalCombinationsPat)
 
 /**
  * Preprocesses a query string and tests for general flaws.
- * @param { string } rawString - the decoded string from the query. 
+ * @param { string } rawString - the decoded string from the query.
  * @returns { string }
  */
 const preprocess = (rawString) => {
