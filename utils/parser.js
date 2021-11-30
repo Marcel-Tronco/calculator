@@ -25,7 +25,7 @@ const catchAllNumPat = /(~*[0-9]*)/g
 cache(catchAllNumPat)
 
 /**
- * returns wether a a character is a valid mathematical operator for the calculator 
+ * returns wether a a character is a valid mathematical operator for the calculator
  * @param { string } char - Character to be tested
  * @returns { boolean }
  */
@@ -35,7 +35,7 @@ const isOperator = (char) => {
 
 /**
  * returns wether a string consists only of characters associated with a number in the sense of the calculator.
- * @param { string } string - String to be tested. 
+ * @param { string } string - String to be tested.
  * @returns { boolean }
  */
 const isAllNum = (string) => {
@@ -123,7 +123,7 @@ const valueRecursion = (element) => {
 
 /**
  * Parses the elements of an Element list to a final value.
- * @param {Array[CalcStringElement]} elementList - The array of CalcStringElements to be parsed  
+ * @param {Array[CalcStringElement]} elementList - The array of CalcStringElements to be parsed
  * @returns { number }
  */
 const parseElements = (elementList) => {
@@ -141,7 +141,7 @@ const parseElements = (elementList) => {
 
 /**
  * Overal process that transforms a preprocessed string to the final result.
- * @param { string } preprocessedCalcString - the preprocessed input string to be parsed. 
+ * @param { string } preprocessedCalcString - the preprocessed input string to be parsed.
  * @returns { number }
  */
 const parser = (preprocessedCalcString) => {
